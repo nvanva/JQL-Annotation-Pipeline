@@ -1,0 +1,33 @@
+[build-system]
+requires = [
+    "setuptools==70.2.0",
+    "setuptools-scm==7.1.0"
+]
+build-backend = "setuptools.build_meta"
+
+# using setuptools_scm results in including all resource files tracked by git (e.g. mt-filter-list.annotated)
+[tool.setuptools_scm]
+
+[project]
+name = "jql-annotation-pipeline"
+dynamic = ["version"]  # setuptools_scm will use the version received from git
+requires-python = ">= 3.10"
+
+dependencies = [
+    "torch==2.6.0",
+    "torchvision==0.21.0",
+    "torchaudio==2.6.0",
+    "xformers==0.0.29.post3",
+    "flash-attn",
+    "transformers==4.44.2",
+    "wandb",
+    "datatrove==0.4.0",
+    "dotenv",
+    "lightning",
+    "orjson",
+    "fire"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]  # ["."] by default
+
