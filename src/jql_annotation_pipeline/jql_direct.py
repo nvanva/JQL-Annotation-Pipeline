@@ -9,7 +9,7 @@ import sys
 from safetensors.torch import save_file
 import psutil
 import os
-
+import time
 
 def _docit(maxlen=None):
     for line in sys.stdin:
@@ -41,8 +41,11 @@ class JQLRunner:
     def __init__(self):
         # load embedder
         self.device = 'cuda'
+        start = time.perf_counter()
         self.embedder = get_embedder_instance('Snowflake/snowflake-arctic-embed-m-v2.0', self.device, torch.bfloat16)
+        print(f'Backbone loaded in {time.perf_counter()-start:.3f}s', file=sys.stderr)
         # load JQL Edu annotation heads
+        start = time.perf_counter()
         regression_head_checkpoints = {
                 f'{teacher}-sf-{trainset[0]}': cached_file('Jackal-AI/JQL-Edu-Heads', f'checkpoints/edu-{teacher}-snowflake-{trainset}.ckpt')
             # for teacher in 'gemma'.split() for trainset in 'balanced'.split()
@@ -51,10 +54,11 @@ class JQLRunner:
         self.regression_heads = {}
         for name, path in regression_head_checkpoints.items():
             self.regression_heads[name] = RegressionHead.load_from_checkpoint(path, map_location=self.device).to(torch.bfloat16)
-        print('Heads loaded:', self.regression_heads.keys(), file=sys.stderr)
+        print(f'Heads loaded in {time.perf_counter()-start:.3f}s:', self.regression_heads.keys(), file=sys.stderr)
 
 
     def test(self):
+        print("TEST!")
         # Given a single document
         doc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
         embeddings = self.embedder.embed([doc, doc])
